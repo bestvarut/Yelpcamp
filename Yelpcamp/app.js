@@ -5,7 +5,8 @@ const ejsMate = require('ejs-mate')
 const wrapAsync = require('./utils/wrapAsync');
 const Campground = require('./models/campground');
 const methodOverride = require('method-override');
-
+const Joi = require('joi');
+const { campgroundSchema } = require('./schemas.js')
 const AppError = require('./utils/AppError');
 
 mongoose.connect('mongodb://localhost:27017/yelp-camp', {
@@ -28,7 +29,15 @@ app.set('views', path.join(__dirname, 'views'))
 app.use(methodOverride('_method'));
 app.use(express.urlencoded({ extended: true }))
 
-
+const validateCampground = (req, res, next) => {
+    const { error } = campgroundSchema.validate(req.body);
+    if (error) {
+        const msg = error.details.map(el => el.message).join(',');
+        throw new AppError(msg, 400)
+    } else {
+        next();
+    }
+}
 
 
 app.get('/', (req, res) => {
@@ -45,8 +54,9 @@ app.get('/campgrounds/new', (req, res) => {
     res.render('campgrounds/new')
 })
 
-app.post('/campgrounds', wrapAsync(async (req, res, next) => {
-    if (!req.body.campground) throw new AppError('Invalid Campground Data', 400);
+app.post('/campgrounds', validateCampground, wrapAsync(async (req, res, next) => {
+    // if (!req.body.campground) throw new AppError('Invalid Campground Data', 400); 
+
     const campground = new Campground(req.body.campground);
     await campground.save();
     res.redirect(`/campgrounds/${campground._id}`)
@@ -65,7 +75,7 @@ app.get('/campgrounds/:id/edit', wrapAsync(async (req, res, next) => {
     res.render('campgrounds/edit', { campground });
 }))
 
-app.put('/campgrounds/:id', wrapAsync(async (req, res, next) => {
+app.put('/campgrounds/:id', validateCampground, wrapAsync(async (req, res, next) => {
     const { id } = req.params;
     const campground = await Campground.findByIdAndUpdate(id, { ...req.body.campground });
     res.redirect(`/campgrounds/${campground._id}`)
