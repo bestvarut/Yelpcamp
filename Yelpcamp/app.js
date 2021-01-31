@@ -1,9 +1,11 @@
 const express = require("express");
 const path = require('path');
 const mongoose = require('mongoose');
-const ejsMate = require('ejs-mate')
+const ejsMate = require('ejs-mate');
+const session = require('express-session')
 const methodOverride = require('method-override');
 const AppError = require('./utils/AppError');
+
 
 const campgrounds = require('./routes/campgrounds')
 const reviews = require('./routes/reviews')
@@ -30,6 +32,18 @@ app.set('views', path.join(__dirname, 'views'));
 app.use(methodOverride('_method'));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
+
+const sessionConfig = {
+    secret: 'badsecretexamplefrombest',
+    resave: false,
+    saveUninitialized: true,
+    cookie: {
+        httpOnly: true,
+        expires: Date.now() + 604800000, //One week
+        maxAge: 604800000
+    }
+}
+app.use(session(sessionConfig))
 
 
 app.use('/campgrounds', campgrounds)
