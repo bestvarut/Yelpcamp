@@ -35,42 +35,49 @@
             </div>
         </div>
         <div class="col-10 offset-1 col-md-8 offset-md-2 col-lg-6 offset-lg-0">
-            <h2>Leave a review</h2>
-            <form class="mb-3 validated-form" novalidate action="/campgrounds/<%= campground._id %>/reviews "
-                method="POST">
-                <div class="mb-3">
-                    <label for="rating" class="form-label">Rating</label>
-                    <input class="form-range" type="range" min="1" max="5" name="review[rating]" id="rating">
-                </div>
-                <div class="mb-3">
-                    <label class="form-label" for="body">Review</label>
-                    <textarea class="form-control" name="review[body]" id="body" cols="30" rows="3" required></textarea>
-                    <div class="invalid-feedback">
-                        Write your review before submit
-                    </div>
-                </div>
-                <button class="btn btn-success">Submit</button>
-            </form>
-            <hr>
-            <div class="mb-3">
-                <% campground.reviews.forEach(re=> { %>
-                    <div class="card mb-2">
-                        <h5 class="card-header">Rating: <%= re.rating %>
-                        </h5>
-                        <div class="card-body">
-                            <p class="card-text">
-                                <%= re.body %>
-                            </p>
-                            <div class="text-muted text-end">By Varut Best : 5 second ago</div>
+            <% if (currentUser) { %>
 
-                            <form method="POST"
-                                action="/campgrounds/<%= campground._id %>/reviews/<%= re._id %>?_method=DELETE"
-                                class="">
-                                <button class="btn-sm btn btn-warning">Delete</button>
-                            </form>
+
+                <h2>Leave a review</h2>
+                <form class="mb-3 validated-form" novalidate action="/campgrounds/<%= campground._id %>/reviews "
+                    method="POST">
+                    <div class="mb-3">
+                        <label for="rating" class="form-label">Rating</label>
+                        <input class="form-range" type="range" min="1" max="5" name="review[rating]" id="rating">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="body">Review</label>
+                        <textarea class="form-control" name="review[body]" id="body" cols="30" rows="3"
+                            required></textarea>
+                        <div class="invalid-feedback">
+                            Write your review before submit
                         </div>
                     </div>
-                    <% }) %>
-            </div>
+                    <button class="btn btn-success">Submit</button>
+                </form>
+                <hr>
+                <% } %>
+                    <div class="mb-3">
+                        <% campground.reviews.forEach(re=> { %>
+                            <div class="card mb-2">
+                                <h5 class="card-header">Rating: <%= re.rating %>
+                                </h5>
+                                <div class="card-body">
+                                    <p class="card-text">
+                                        <%= re.body %>
+                                    </p>
+                                    <div class="text-muted text-end">By <%= re.author.username %> : 5 second ago</div>
+                                    <% if (currentUser && re.author.equals(currentUser._id)) { %>
+                                        <form method="POST"
+                                            action="/campgrounds/<%= campground._id %>/reviews/<%= re._id %>?_method=DELETE"
+                                            class="">
+                                            <button class="btn-sm btn btn-danger">Delete</button>
+                                        </form>
+                                        <% } %>
+
+                                </div>
+                            </div>
+                            <% }) %>
+                    </div>
         </div>
     </div>
