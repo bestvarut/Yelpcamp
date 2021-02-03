@@ -4,10 +4,16 @@ const campground = require('../controllers/campgrounds')
 const { isLoggedIn, validateCampground, isAuthor } = require("../middleware");
 
 const wrapAsync = require('../utils/wrapAsync');
+const multer = require('multer');
+const upload = multer({ dest: 'uploads/' });
 
 router.route('/')
     .get(wrapAsync(campground.index))
-    .post(isLoggedIn, validateCampground, wrapAsync(campground.createCampground))
+    // .post(isLoggedIn, validateCampground, wrapAsync(campground.createCampground))
+    .post(upload.array('image'), (req, res) => {
+        console.log(req.body, req.files);
+        res.send('it work')
+    })
 
 router.get('/new', isLoggedIn, campground.renderNewForm)
 
