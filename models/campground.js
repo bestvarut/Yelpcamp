@@ -7,7 +7,12 @@ const CampgroungSchema = new Schema({
         type: String,
         required: true
     },
-    image: String,
+    image: [
+        {
+            url: String,
+            filename: String
+        }
+    ],
     price: {
         type: Number,
         required: true,
