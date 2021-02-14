@@ -17,6 +17,17 @@ const CampgroungSchema = new Schema({
         required: true
     },
     image: [ImageSchema],
+    geometry: {
+        type: {
+            type: String,
+            enum: ['Point'],
+            require: true
+        },
+        coordinates: {
+            type: [Number],
+            require: true
+        }
+    },
     price: {
         type: Number,
         required: true,
