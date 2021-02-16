@@ -13,6 +13,7 @@ const AppError = require('./utils/AppError');
 const passport = require('passport');
 const LocalStrategy = require('passport-local')
 const User = require('./models/user');
+const mongoSanitize = require('express-mongo-sanitize');
 
 const userRoutes = require('./routes/users')
 const campgroundRoutes = require('./routes/campgrounds')
@@ -40,6 +41,7 @@ app.set('views', path.join(__dirname, 'views'));
 app.use(methodOverride('_method'));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(mongoSanitize());
 
 const sessionConfig = {
     secret: 'badsecretexamplefrombest',
@@ -64,17 +66,18 @@ passport.deserializeUser(User.deserializeUser());
 app.use((req, res, next) => {
     // console.log('--------')
     // console.log(req.session)
+console.log(req.query)
     res.locals.currentUser = req.user;
     res.locals.success = req.flash('success');
     res.locals.error = req.flash('error');
     next();
 })
 
-app.get('/fakeuser', async (req, res, next) => {
-    const user = new User({ email: 'best@gmail.com', username: 'best1' });
-    const newUser = await User.register(user, '123456');
-    res.send(newUser)
-})
+// app.get('/fakeuser', async (req, res, next) => {
+//     const user = new User({ email: 'best@gmail.com', username: 'best1' });
+//     const newUser = await User.register(user, '123456');
+//     res.send(newUser)
+// })
 
 app.use('/', userRoutes)
 app.use('/campgrounds', campgroundRoutes)
