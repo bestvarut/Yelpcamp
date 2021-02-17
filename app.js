@@ -21,7 +21,11 @@ const userRoutes = require('./routes/users')
 const campgroundRoutes = require('./routes/campgrounds')
 const reviewRoutes = require('./routes/reviews')
 
-mongoose.connect('mongodb://localhost:27017/yelp-camp', {
+const MongoDBStore = require('connect-mongo')(session);
+
+const dbUrl = process.env.DB_URL || "mongodb://localhost:27017/yelp-camp" ;
+// 'mongodb://localhost:27017/yelp-camp'
+mongoose.connect(dbUrl, {
     useNewUrlParser: true,
     useCreateIndex: true,
     useUnifiedTopology: true,
@@ -44,11 +48,22 @@ app.use(methodOverride('_method'));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(mongoSanitize());
+const secret = process.env.SECRET || 'badsecretexamplefrombest';
 
+const store = new MongoDBStore({
+    url: dbUrl,
+    secret,
+    touchAfter: 24 * 3600
+});
+
+store.on("error",function(e){
+    console.log("SESSION STORE ERROR",e)
+})
 
 const sessionConfig = {
+    store,
     name: 'session',
-    secret: 'badsecretexamplefrombest',
+    secret,
     resave: false,
     saveUninitialized: true,
     cookie: {
@@ -116,7 +131,6 @@ passport.deserializeUser(User.deserializeUser());
 app.use((req, res, next) => {
     // console.log('--------')
     // console.log(req.session)
-console.log(req.query)
     res.locals.currentUser = req.user;
     res.locals.success = req.flash('success');
     res.locals.error = req.flash('error');
