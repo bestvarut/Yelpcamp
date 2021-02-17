@@ -52,7 +52,6 @@ CampgroungSchema.virtual('properties.popUpMarkup').get(function () {
 });
 
 CampgroungSchema.post('findOneAndDelete', async function (doc) {
-    console.log(doc)
     if (doc) {
         await Review.remove({
             _id: {
