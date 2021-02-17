@@ -23,7 +23,7 @@ const reviewRoutes = require('./routes/reviews')
 
 const MongoDBStore = require('connect-mongo')(session);
 
-const dbUrl = "mongodb://localhost:27017/yelp-camp" ;
+const dbUrl = "mongodb://localhost:27017/yelp-camp";
 // 'mongodb://localhost:27017/yelp-camp'
 mongoose.connect(dbUrl, {
     useNewUrlParser: true,
@@ -56,8 +56,8 @@ const store = new MongoDBStore({
     touchAfter: 24 * 3600
 });
 
-store.on("error",function(e){
-    console.log("SESSION STORE ERROR",e)
+store.on("error", function (e) {
+    console.log("SESSION STORE ERROR", e)
 })
 
 const sessionConfig = {
@@ -164,6 +164,7 @@ app.use((err, req, res, next) => {
     res.status(statusCode).render('error', { err });
 })
 
-app.listen(3000, () => {
-    console.log('Connect on port 3000')
+const port = process.env.PORT || 3000;
+app.listen(port, () => {
+    console.log(`Connect on port ${port}`)
 })
